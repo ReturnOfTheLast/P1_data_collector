@@ -1,17 +1,25 @@
 # Import Modules
 from pymongo import MongoClient
 
+# Function to connect the database
+# TODO: Make this not hardcoded
 def db_connect() -> MongoClient:
     return MongoClient("mongodb://root:password@localhost:27017/")
 
+# Make client
 client = db_connect()
 
+# Function to get the correct collections
 def create_collections() -> tuple:
     global client
     db = client["scandata"]
-    return db["data_frames"], db["ap_data_frames"], db["bssid_pool"], db["ssid_pool"]
+    return (db["data_frames"],
+            db["ap_data_frames"],
+            db["bssid_pool"],
+            db["ssid_pool"])
 
 """
+Sample data frame
 data = {
     "scandata": [
         ["000000000001", "SSID1", -10],
@@ -30,36 +38,52 @@ data = {
 }
 """
 
+# Function to handle a data frame
 def handler(data: dict):
-    global client
+    # Get the collections
     data_frames, ap_data_frames, bssid_pool, ssid_pool = create_collections()
-
+    
+    # Make list of access point data frames (subframes)
     ap_data_frame_ids = []
 
+    # Go over all access points in data frame
     for ap in data["scandata"]:
+
+        # Check if the SSID is already registered
         ssid_data = ssid_pool.find_one({"name": ap[1]})
         if not ssid_data:
-            ssid_id = ssid_pool.insert_one({"name": ap[1]}).inserted_id
+            # If not create it and get the id
+            ssid_id = ssid_pool.insert_one({
+                "name": ap[1]
+            }).inserted_id
         else:
+            # Or just get the id of the existing one
             ssid_id = ssid_data["_id"]
 
+        # Check if the BSSID/MAC Address is already registered
         bssid_data = bssid_pool.find_one({"name": ap[0]})
         if not bssid_data:
-            bssid_id = bssid_pool.insert_one({"name": ap[0], "ssid": ssid_id}).inserted_id
+            # If not create it and get the id
+            bssid_id = bssid_pool.insert_one({
+                "name": ap[0],
+                "ssid": ssid_id
+            }).inserted_id
         else:
+            # Or just get the id of the existing one
             bssid_id = bssid_data["_id"]
 
-        ap_data_frame = {
-                "bssid": bssid_id,
-                "rssi": ap[2]
-        }
+        # Insert the access point data frame (subframe)
+        # in the database and add the id to the list
+        ap_data_frame_ids.append(
+                ap_data_frames.insert_one({
+                    "bssid": bssid_id,  # Id of the BSSID
+                    "rssi": ap[2]       # Measured rssi signal strength in dBm
+                }).inserted_id
+        )
 
-        ap_data_frame_ids.append(ap_data_frames.insert_one(ap_data_frame).inserted_id)
-    
-    data_frame = {
-            "location": data["location"],
-            "time": data["time"],
-            "ap_data_frames": ap_data_frame_ids
-    }
-
-    data_frames.insert_one(data_frame)
+    # Create the final data frame
+    data_frames.insert_one({
+        "location": data["location"],       # Location of scan
+        "time": data["time"],               # Timestamp of scan
+        "ap_data_frames": ap_data_frame_ids # List of ap data frame ids
+    })
