@@ -21,7 +21,7 @@ logging.info(f"Socket is bound on {addr[0]} port {addr[1]}")
 def handler_thread(name, data):
     logging.info(f"Handler {name} starting")
     decoded_data = json.loads(data.decode("utf-8"))
-    handler(decoded_data)
+    handler(name, decoded_data)
     logging.info(f"Handler {name} finishing")
 
 frame_number = 0
@@ -32,6 +32,7 @@ while True:
     data = sock.recv(2048)
     logging.info(f"Received data frame {frame_number}")
     logging.info(f"{data!r}")
+    # TODO: limit the number of active threads and queue the extras
     t = threading.Thread(target=handler_thread, args=(frame_number, data), daemon=True)
     t.start()
     frame_number += 1

@@ -2,7 +2,6 @@
 from pymongo import MongoClient
 
 # Function to connect the database
-# TODO: Make this not hardcoded
 def db_connect(username: str, password: str, host: str) -> MongoClient:
     return MongoClient(f"mongodb://{username}:{password}@{host}:27017/")
 
@@ -39,7 +38,7 @@ data = {
 """
 
 # Function to handle a data frame
-def handler(data: dict):
+def handler(number: int, data: dict):
     # Get the collections
     data_frames, ap_data_frames, bssid_pool, ssid_pool = create_collections()
     
@@ -83,6 +82,7 @@ def handler(data: dict):
 
     # Create the final data frame
     data_frames.insert_one({
+        "number": number,
         "location": data["location"],       # Location of scan
         "time": data["time"],               # Timestamp of scan
         "ap_data_frames": ap_data_frame_ids # List of ap data frame ids
