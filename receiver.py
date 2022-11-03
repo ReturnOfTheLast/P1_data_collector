@@ -32,6 +32,6 @@ while True:
     data = sock.recv(2048)
     logging.info(f"Received data frame {frame_number}")
     logging.info(f"{data!r}")
-    t = threading.Thread(target=handler_thread, args=(frame_number, data))
+    t = threading.Thread(target=handler_thread, args=(frame_number, data), daemon=True)
     t.start()
     frame_number += 1
