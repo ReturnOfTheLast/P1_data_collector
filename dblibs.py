@@ -3,11 +3,11 @@ from pymongo import MongoClient
 
 # Function to connect the database
 # TODO: Make this not hardcoded
-def db_connect() -> MongoClient:
-    return MongoClient("mongodb://root:password@localhost:27017/")
+def db_connect(username: str, password: str, host: str) -> MongoClient:
+    return MongoClient(f"mongodb://{username}:{password}@{host}:27017/")
 
 # Make client
-client = db_connect()
+client = db_connect("root", "password", "localhost")
 
 # Function to get the correct collections
 def create_collections() -> tuple:
@@ -21,7 +21,7 @@ def create_collections() -> tuple:
 """
 Sample data frame
 data = {
-    "scandata": [
+    "scan": [
         ["000000000001", "SSID1", -10],
         ["000000000002", "SSID2", -10],
         ["000000000003", "SSID3", -10],
@@ -47,7 +47,7 @@ def handler(data: dict):
     ap_data_frame_ids = []
 
     # Go over all access points in data frame
-    for ap in data["scandata"]:
+    for ap in data["scan"]:
 
         # Check if the SSID is already registered
         ssid_data = ssid_pool.find_one({"name": ap[1]})
