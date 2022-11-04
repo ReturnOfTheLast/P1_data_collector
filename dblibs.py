@@ -3,6 +3,16 @@ from pymongo import MongoClient
 
 # Function to connect the database
 def db_connect(username: str, password: str, host: str) -> MongoClient:
+    """Function to connect to a mongodb database.
+
+    Args:
+        username (str): The username to login with
+        password (str): The password to login with
+        host (str): Hostname/address of the database
+
+    Returns:
+        MongoClient: A database client to interact with the database
+    """
     return MongoClient(f"mongodb://{username}:{password}@{host}:27017/")
 
 # Make client
@@ -10,6 +20,11 @@ client = db_connect("root", "password", "localhost")
 
 # Function to get the correct collections
 def create_collections() -> tuple:
+    """Function to get all the collections that is needed.
+
+    Returns:
+        tuple: Collections
+    """
     global client
     db = client["scandata"]
     return (db["data_frames"],
@@ -39,6 +54,12 @@ data = {
 
 # Function to handle a data frame
 def handler(number: int, data: dict):
+    """Function to handle and insert data frames into the database.
+
+    Args:
+        number (int): Data Frame number
+        data (dict): Data Frame
+    """
     # Get the collections
     data_frames, ap_data_frames, bssid_pool, ssid_pool = create_collections()
     

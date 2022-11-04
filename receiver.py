@@ -27,7 +27,13 @@ sock.bind(addr)
 logging.info(f"Socket is bound on {addr[0]} port {addr[1]}")
 
 # Make thread function for handler
-def handler_thread(name, data):
+def handler_thread(name: str, data: bytes):
+    """Function for threads to handle data frames.
+
+    Args:
+        name (str): Name of the hander thread
+        data (bytes): Data to hande
+    """
     logging.info(f"Handler {name} starting")
     decoded_data = json.loads(data.decode("utf-8"))
     handler(name, decoded_data)
