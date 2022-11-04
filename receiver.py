@@ -9,8 +9,22 @@ from dblibs import handler
 log_format = "%(asctime)s %(levelname)s: %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO, datefmt="%H:%M:%S")
 
+# Let the scanner know what your ip is
+neg_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+scanner_up = False
+while not scanner_up:
+    try:
+        neg_sock.connect("192.168.4.100", 61111)
+        if neg_sock.recv(512) == b"\x01":
+            scanner_up = True
+    except:
+        pass
+
+neg_sock.close()
+
+
 # Define bind address
-addr = ("192.168.4.50", 62222)
+addr = ("", 62222)
 
 # Make socket and bind it to the address
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
