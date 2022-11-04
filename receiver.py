@@ -2,8 +2,21 @@
 import socket
 import json
 import logging
+import argparse
 from concurrent.futures import  ThreadPoolExecutor
-from dblibs import handler
+from dblibs import db_connect, handler
+
+# Optional docker flag
+parser = argparse.ArgumentParser()
+parser.add_argument('--docker', action="store_true", default=False, dest="docker")
+args = parser.parse_args()
+
+db_username = "root"
+db_password = "password"
+db_host = "localhost"
+
+if args.docker:
+    db_host = "mongo"
 
 # Define logging behavior
 log_format = "%(asctime)s %(levelname)s: %(message)s"
@@ -16,7 +29,6 @@ neg_sock.connect(("192.168.4.100", 61111))
 
 logging.info("Scanner has received our ip address")
 neg_sock.close()
-
 
 # Define bind address
 addr = ("", 62222)
@@ -36,7 +48,8 @@ def handler_thread(name: str, data: bytes):
     """
     logging.info(f"Handler {name} starting")
     decoded_data = json.loads(data.decode("utf-8"))
-    handler(name, decoded_data)
+    client = db_connect(db_username, db_password, db_host)
+    handler(client, name, decoded_data)
     logging.info(f"Handler {name} finishing")
 
 # Make a thread pool with 4 threads

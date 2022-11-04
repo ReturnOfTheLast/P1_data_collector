@@ -15,17 +15,16 @@ def db_connect(username: str, password: str, host: str) -> MongoClient:
     """
     return MongoClient(f"mongodb://{username}:{password}@{host}:27017/")
 
-# Make client
-client = db_connect("root", "password", "localhost")
-
 # Function to get the correct collections
-def create_collections() -> tuple:
+def create_collections(client: MongoClient) -> tuple:
     """Function to get all the collections that is needed.
+
+    Args:
+        client (MongoClient): Database client to use
 
     Returns:
         tuple: Collections
     """
-    global client
     db = client["scandata"]
     return (db["data_frames"],
             db["ap_data_frames"],
@@ -53,15 +52,16 @@ data = {
 """
 
 # Function to handle a data frame
-def handler(number: int, data: dict):
+def handler(client: MongoClient, number: int, data: dict):
     """Function to handle and insert data frames into the database.
 
     Args:
+        client (MongoClient): Database client to use
         number (int): Data Frame number
         data (dict): Data Frame
     """
     # Get the collections
-    data_frames, ap_data_frames, bssid_pool, ssid_pool = create_collections()
+    data_frames, ap_data_frames, bssid_pool, ssid_pool = create_collections(client)
     
     # Make list of access point data frames (subframes)
     ap_data_frame_ids = []

@@ -9,10 +9,21 @@ volumes:
     external: false
 
 services:
+  data_collector:
+    build: .
+    container_name: "data_collector"
+    restart: unless-stopped
+    networks:
+      - "mongo_net"
+    ports:
+      - "62222:62222/udp"
+    depends_on:
+      - "mongo"
+
   mongo:
     image: mongo
     container_name: "mongo"
-    restart: always
+    restart: unless-stopped
     networks:
       - "mongo_net"
     ports:
@@ -26,7 +37,7 @@ services:
   mongo-express:
     image: mongo-express
     container_name: "mongo-express"
-    restart: always
+    restart: unless-stopped
     networks:
       - "mongo_net"
     ports:
