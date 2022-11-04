@@ -10,16 +10,11 @@ log_format = "%(asctime)s %(levelname)s: %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO, datefmt="%H:%M:%S")
 
 # Let the scanner know what your ip is
+logging.info("Trying to connect to the scanner")
 neg_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-scanner_up = False
-while not scanner_up:
-    try:
-        neg_sock.connect("192.168.4.100", 61111)
-        if neg_sock.recv(512) == b"\x01":
-            scanner_up = True
-    except:
-        pass
+neg_sock.connect(("192.168.4.100", 61111))
 
+logging.info("Scanner has received our ip address")
 neg_sock.close()
 
 
