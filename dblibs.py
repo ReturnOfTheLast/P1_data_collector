@@ -104,7 +104,7 @@ def handler(client: MongoClient, number: int, data: dict):
     # Create the final data frame
     data_frames.insert_one({
         "number": number,
-        "location": data["location"],       # Location of scan
+        "location": [float(data["location"][0]), float(data["location"][1])],       # Location of scan
         "time": data["time"],               # Timestamp of scan
         "ap_data_frames": ap_data_frame_ids # List of ap data frame ids
     })
