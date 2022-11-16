@@ -1,5 +1,6 @@
 # Import Modules
 from pymongo import MongoClient
+from pymongo.collection import Collection
 
 # Function to connect the database
 def db_connect(username: str, password: str, host: str) -> MongoClient:
@@ -16,14 +17,16 @@ def db_connect(username: str, password: str, host: str) -> MongoClient:
     return MongoClient(f"mongodb://{username}:{password}@{host}:27017/")
 
 # Function to get the correct collections
-def create_collections(client: MongoClient) -> tuple:
+def create_collections(
+    client: MongoClient
+) -> tuple[Collection, Collection, Collection, Collection]:
     """Function to get all the collections that is needed.
 
     Args:
         client (MongoClient): Database client to use
 
     Returns:
-        tuple: Collections
+        tuple[Collection, Collection, Collection, Collection]: Collections
     """
     db = client["scandata"]
     return (db["data_frames"],
@@ -52,7 +55,7 @@ data = {
 """
 
 # Function to handle a data frame
-def handler(client: MongoClient, number: int, data: dict):
+def handler(client: MongoClient, number: int, data: dict) -> None:
     """Function to handle and insert data frames into the database.
 
     Args:
