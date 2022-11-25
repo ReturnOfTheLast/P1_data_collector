@@ -34,26 +34,6 @@ def create_collections(
             db["bssid_pool"],
             db["ssid_pool"])
 
-"""
-Sample data frame
-data = {
-    "scan": [
-        ["000000000001", "SSID1", -10],
-        ["000000000002", "SSID2", -10],
-        ["000000000003", "SSID3", -10],
-        ["000000000004", "SSID4", -10],
-        ["000000000005", "SSID5", -10],
-        ["000000000006", "SSID6", -10],
-        ["000000000007", "SSID7", -10],
-        ["000000000008", "SSID8", -10],
-        ["000000000009", "SSID9", -10],
-        ["000000000010", "SSID10", -10]
-    ],
-    "location": [0, 0, 0],
-    "time": 0
-}
-"""
-
 # Function to handle a data frame
 def handler(client: MongoClient, number: int, data: dict) -> None:
     """Function to handle and insert data frames into the database.
