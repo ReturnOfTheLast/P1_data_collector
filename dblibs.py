@@ -1,8 +1,10 @@
+"""Module to interact with database
+"""
+
 # Import Modules
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-# Function to connect the database
 def db_connect(username: str, password: str, host: str) -> MongoClient:
     """Function to connect to a mongodb database.
 
@@ -14,9 +16,10 @@ def db_connect(username: str, password: str, host: str) -> MongoClient:
     Returns:
         MongoClient: A database client to interact with the database
     """
+
+    # Make and return database client connection
     return MongoClient(f"mongodb://{username}:{password}@{host}:27017/")
 
-# Function to get the correct collections
 def create_collections(
     client: MongoClient
 ) -> tuple[Collection, Collection, Collection, Collection]:
@@ -28,13 +31,14 @@ def create_collections(
     Returns:
         tuple[Collection, Collection, Collection, Collection]: Collections
     """
+
+    # Get the database and return all the collections
     db = client["scandata"]
     return (db["data_frames"],
             db["ap_data_frames"],
             db["bssid_pool"],
             db["ssid_pool"])
 
-# Function to handle a data frame
 def handler(client: MongoClient, number: int, data: dict) -> None:
     """Function to handle and insert data frames into the database.
 
@@ -43,6 +47,7 @@ def handler(client: MongoClient, number: int, data: dict) -> None:
         number (int): Data Frame number
         data (dict): Data Frame
     """
+
     # Get the collections
     data_frames, ap_data_frames, bssid_pool, ssid_pool = create_collections(client)
     

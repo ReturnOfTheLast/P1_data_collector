@@ -1,28 +1,35 @@
+"""Main file that connects and receives udp data packets from the wifi scanner
+"""
+
 # Import Modules
 import socket
 import json
 import logging
 import argparse
 from concurrent.futures import  ThreadPoolExecutor
+
+# Import functions from the dblibs module
 from dblibs import db_connect, handler
 
-# Optional docker flag
+# Docker flag for use with docker container networking
 parser = argparse.ArgumentParser()
 parser.add_argument('--docker', action="store_true", default=False, dest="docker")
 args = parser.parse_args()
 
+# Set the database credentials
 db_username = "root"
 db_password = "password"
 db_host = "localhost"
 
-if args.docker:
-    db_host = "mongo"
+# Use docker internal dns resolution instead of localhost
+# if the docker flag is set
+if args.docker: db_host = "mongo"
 
 # Define logging behavior
 log_format = "%(asctime)s %(levelname)s: %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO, datefmt="%H:%M:%S")
 
-# Let the scanner know what your ip is
+# Let the scanner know what our ip is
 logging.info("Trying to connect to the scanner")
 neg_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 neg_sock.connect(("192.168.4.100", 61111))
@@ -38,7 +45,6 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(addr)
 logging.info(f"Socket is bound on {addr[0]} port {addr[1]}")
 
-# Make thread function for handler
 def handler_thread(name: str, data: bytes):
     """Function for threads to handle data frames.
 
@@ -62,6 +68,8 @@ frame_number = 0
 while True:
     try:
         logging.info(f"Listening for data frame {frame_number}")
+
+        # Catch data packet
         data = sock.recv(2048)
         logging.info(f"Received data frame {frame_number}")
         logging.info(f"{data!r}")
@@ -71,4 +79,5 @@ while True:
     except KeyboardInterrupt:
         break
 
+# Shutdown the threadpool
 threadpool.shutdown(wait=True)
