@@ -95,6 +95,6 @@ def handler(client: MongoClient, number: int, data: dict) -> None:
         "number": number,
         "location": [float(data["location"][0]), float(data["location"][1])],       # Location of scan
         #"time": data["time"],
-        "time":time.time()               # Timestamp of scan
+        "time": time.time(),               # Timestamp of scan
         "ap_data_frames": ap_data_frame_ids # List of ap data frame ids
     })
