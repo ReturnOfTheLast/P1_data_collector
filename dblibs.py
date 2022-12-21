@@ -4,6 +4,7 @@
 # Import Modules
 from pymongo import MongoClient
 from pymongo.collection import Collection
+import time
 
 def db_connect(username: str, password: str, host: str) -> MongoClient:
     """Function to connect to a mongodb database.
@@ -93,6 +94,7 @@ def handler(client: MongoClient, number: int, data: dict) -> None:
     data_frames.insert_one({
         "number": number,
         "location": [float(data["location"][0]), float(data["location"][1])],       # Location of scan
-        "time": data["time"],               # Timestamp of scan
+        #"time": data["time"],
+        "time":time.time()               # Timestamp of scan
         "ap_data_frames": ap_data_frame_ids # List of ap data frame ids
     })
